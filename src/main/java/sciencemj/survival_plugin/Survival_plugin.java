@@ -15,7 +15,7 @@ public final class Survival_plugin extends JavaPlugin {
             public void run() {
                 Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), "save-all");
             }
-        },20L, 1200L);
+        },20L, 2400L);
         Bukkit.getServer().getPluginManager().registerEvents(new EventMain(), this);
     }
 
