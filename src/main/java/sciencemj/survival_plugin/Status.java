@@ -10,7 +10,9 @@ import org.bukkit.potion.PotionEffectType;
 public enum Status {
     BreakBones("break_bones", new PotionEffect(PotionEffectType.SLOW, 20, 2, true, false)),
     Bleed("bleed", new PotionEffect(PotionEffectType.WITHER, 20, 1, true, false)),
-    Critical("critical", new PotionEffect(PotionEffectType.HARM, 20, 0, true,false));
+    Critical("critical", new PotionEffect(PotionEffectType.HARM, 20, 0, true,false)),
+    StressDig("stress_dig", new PotionEffect(PotionEffectType.SLOW_DIGGING, 20, 1,true,false)),
+    StressAtk("stress_atk", new PotionEffect(PotionEffectType.WEAKNESS, 20,1, true,false));
 
     private final String name;
     private final PotionEffect effect;

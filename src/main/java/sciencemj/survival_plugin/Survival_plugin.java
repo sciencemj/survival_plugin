@@ -17,6 +17,23 @@ public final class Survival_plugin extends JavaPlugin {
             }
         },20L, 2400L);
         Bukkit.getServer().getPluginManager().registerEvents(new EventMain(), this);
+        Bukkit.getScheduler().scheduleSyncRepeatingTask(this,new Runnable(){
+            @Override
+            public void run() {
+                EventMain.digCount.forEach((key, value)
+                    -> {
+                    if (value > 0) {
+                        EventMain.digCount.put(key, value - 1);
+                    }
+                });
+                EventMain.atkCount.forEach((key, value)
+                        -> {
+                    if (value > 0) {
+                        EventMain.atkCount.put(key, value - 1);
+                    }
+                });
+            }
+        },0L, 70L);
     }
 
     @Override
