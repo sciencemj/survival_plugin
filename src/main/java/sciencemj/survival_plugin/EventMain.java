@@ -4,13 +4,17 @@ package sciencemj.survival_plugin;
 import net.md_5.bungee.api.ChatMessageType;
 import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.ChatColor;
+import org.bukkit.advancement.Advancement;
+import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
+import org.bukkit.event.player.PlayerAdvancementDoneEvent;
 import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -31,7 +35,7 @@ public class EventMain implements Listener {
                     action(p, "bone");
                 }else if (i < 60){
                     action(p, "bleed");
-                }else if (i < 80){
+                }else if (i < 75){
                     action(p, "critical");
                 }
             }else if (e.getDamage() >= 2){
@@ -39,7 +43,7 @@ public class EventMain implements Listener {
                     action(p, "bone");
                 }else if (i < 30){
                     action(p, "bleed");
-                }else if (i < 40){
+                }else if (i < 37){
                     action(p, "critical");
                 }
             }
@@ -72,7 +76,14 @@ public class EventMain implements Listener {
             }else {
                 atkCount.put(p, 1);
             }
+            if (e.getEntity().getType().equals(EntityType.ENDER_DRAGON)){
+                p.addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS, 20,0,true,false));
+            }
         }
+    }
+
+    @EventHandler
+    public void killEnderDragon(PlayerAdvancementDoneEvent e){
     }
     public void action(Player p, String s){
         if (statuses.containsKey(p)){
