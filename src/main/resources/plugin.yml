@@ -1,0 +1,6 @@
+name: Survival_plugin
+version: @version@
+main: sciencemj.survival_plugin.Survival_plugin
+api-version: 1.16
+authors: [ sciencemj ]
+description: plugin for survival
