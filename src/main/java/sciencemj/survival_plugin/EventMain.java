@@ -31,6 +31,7 @@ public class EventMain implements Listener {
                     }else{
                         PlayerStatus ps = new PlayerStatus(p);
                         ps.getPlayerEffects().put(Status.BreakBones, 5);
+                        ps.run();
                         statuses.put(p, ps);
                     }
                 }
