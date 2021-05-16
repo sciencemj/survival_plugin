@@ -65,7 +65,7 @@ public class EventMain implements Listener {
             Player p = (Player) e.getDamager();
             if (atkCount.containsKey(p)){
                 atkCount.put(p, atkCount.get(p) + 1);
-                if (atkCount.get(p) >= 5){
+                if (atkCount.get(p) >= 3){
                     action(p, "attack");
                     atkCount.remove(p);
                 }
@@ -109,7 +109,7 @@ public class EventMain implements Listener {
                     p.spigot().sendMessage(ChatMessageType.ACTION_BAR,
                             TextComponent.fromLegacyText(ChatColor.RED + "공격하다 지쳤습니다!"));
                     if (statuses.containsKey(p)) {
-                        statuses.get(p).getPlayerEffects().put(Status.StressAtk, 3);
+                        statuses.get(p).getPlayerEffects().put(Status.StressAtk, 5);
                     }
                     break;
                 default:
