@@ -3,9 +3,11 @@ package sciencemj.survival_plugin;
 
 import net.md_5.bungee.api.ChatMessageType;
 import net.md_5.bungee.api.chat.TextComponent;
-import org.bukkit.ChatColor;
+import org.bukkit.*;
 import org.bukkit.advancement.Advancement;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
+import org.bukkit.entity.Firework;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -13,6 +15,7 @@ import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.player.PlayerAdvancementDoneEvent;
+import org.bukkit.inventory.meta.FireworkMeta;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
@@ -24,9 +27,10 @@ public class EventMain implements Listener {
     HashMap<Player, PlayerStatus> statuses = new HashMap<Player, PlayerStatus>();
     public static HashMap<Player, Integer> digCount = new HashMap<Player, Integer>();
     public static HashMap<Player, Integer> atkCount = new HashMap<Player, Integer>();
+    boolean hardmode = true;
     @EventHandler
     public void onPlayerDamageEvent(EntityDamageEvent e){
-        if (e.getEntity() instanceof Player){
+        if (e.getEntity() instanceof Player && hardmode){
             Player p = (Player) e.getEntity();
             Random r = new Random();
             int i = r.nextInt(100);
@@ -52,20 +56,22 @@ public class EventMain implements Listener {
     @EventHandler
     public void playerDigEvent(BlockBreakEvent e){
         Player p = e.getPlayer();
-        if (digCount.containsKey(p)){
-            digCount.put(p, digCount.get(p) + 1);
-            if (digCount.get(p) >= 10){
-                action(p, "dig");
-                digCount.remove(p);
+        if (hardmode) {
+            if (digCount.containsKey(p)) {
+                digCount.put(p, digCount.get(p) + 1);
+                if (digCount.get(p) >= 10) {
+                    action(p, "dig");
+                    digCount.remove(p);
+                }
+            } else {
+                digCount.put(p, 1);
             }
-        }else {
-            digCount.put(p, 1);
         }
     }
 
     @EventHandler
     public void playerAtkEvent(EntityDamageByEntityEvent e){
-        if (e.getDamager() instanceof Player){
+        if (e.getDamager() instanceof Player && hardmode){
             Player p = (Player) e.getDamager();
             if (atkCount.containsKey(p)){
                 atkCount.put(p, atkCount.get(p) + 1);
@@ -84,6 +90,29 @@ public class EventMain implements Listener {
 
     @EventHandler
     public void killEnderDragon(PlayerAdvancementDoneEvent e){
+        for (Player p: Bukkit.getOnlinePlayers()) {
+            p.sendMessage(e.getEventName() +" // " + e.getAdvancement().getKey().getKey());
+            p.playSound(p.getLocation(), Sound.MUSIC_END, 10, 1);
+            p.sendTitle(ChatColor.GREEN+"엔더 드래곤을 격파했습니다!", "", 20,40,20);
+            Bukkit.getScheduler().scheduleSyncDelayedTask(Survival_plugin.plugin, new Runnable() {
+                @Override
+                public void run() {
+                    p.sendTitle(ChatColor.GREEN+"세계에 평화가 찾아옵니다", "난이도 쉬움,HARDMODE:OFF", 20,40,20);
+                    p.getWorld().setDifficulty(Difficulty.EASY);
+                    hardmode=false;
+                    for (int i = 1;i < 6;i++){
+                        Firework firework = p.getWorld().spawn(p.getLocation(), Firework.class);
+                        FireworkMeta meta = firework.getFireworkMeta();
+                        meta.setPower(i);
+                        meta.addEffect(FireworkEffect.builder()
+                                .trail(true)
+                                .withColor(Color.YELLOW, Color.GREEN)
+                                .flicker(true)
+                                .with(FireworkEffect.Type.STAR).build());
+                    }
+                }
+            },80);
+        }
     }
     public void action(Player p, String s){
         if (statuses.containsKey(p)){
