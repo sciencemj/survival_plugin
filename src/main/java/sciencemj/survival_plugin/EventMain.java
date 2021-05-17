@@ -27,14 +27,21 @@ public class EventMain implements Listener {
     HashMap<Player, PlayerStatus> statuses = new HashMap<Player, PlayerStatus>();
     public static HashMap<Player, Integer> digCount = new HashMap<Player, Integer>();
     public static HashMap<Player, Integer> atkCount = new HashMap<Player, Integer>();
-    boolean hardmode = true;
+    boolean gameClear = Survival_plugin.config.getBoolean("gameClear");
     @EventHandler
     public void onPlayerDamageEvent(EntityDamageEvent e){
-        if (e.getEntity() instanceof Player && hardmode){
+        if (e.getEntity() instanceof Player && !gameClear){
             Player p = (Player) e.getEntity();
             Random r = new Random();
             int i = r.nextInt(100);
-            if (e.getDamage() >= 5){  // 중상
+            if (e.getDamage() >= 7){ // 치명상
+                action(p, "bone");
+                if (i < 75){
+                    action(p, "bleed");
+                }else if (i < 99){
+                    action(p, "critical");
+                }
+            }else if (e.getDamage() >= 5){  // 중상
                 if (i < 40){ //골절
                     action(p, "bone");
                 }else if (i < 60){
@@ -56,7 +63,7 @@ public class EventMain implements Listener {
     @EventHandler
     public void playerDigEvent(BlockBreakEvent e){
         Player p = e.getPlayer();
-        if (hardmode) {
+        if (!gameClear) {
             if (digCount.containsKey(p)) {
                 digCount.put(p, digCount.get(p) + 1);
                 if (digCount.get(p) >= 10) {
@@ -71,7 +78,7 @@ public class EventMain implements Listener {
 
     @EventHandler
     public void playerAtkEvent(EntityDamageByEntityEvent e){
-        if (e.getDamager() instanceof Player && hardmode){
+        if (e.getDamager() instanceof Player && !gameClear){
             Player p = (Player) e.getDamager();
             if (atkCount.containsKey(p)){
                 atkCount.put(p, atkCount.get(p) + 1);
@@ -100,7 +107,8 @@ public class EventMain implements Listener {
                     public void run() {
                         p.sendTitle(ChatColor.GREEN + "세계에 평화가 찾아옵니다", "난이도 쉬움,HARDMODE:OFF", 20, 40, 20);
                         p.getWorld().setDifficulty(Difficulty.EASY);
-                        hardmode = false;
+                        gameClear = false;
+                        Survival_plugin.config.set("gameClear", true);
                         for (int i = 1; i < 6; i++) {
                             Firework firework = p.getWorld().spawn(p.getLocation(), Firework.class);
                             FireworkMeta meta = firework.getFireworkMeta();
@@ -121,36 +129,31 @@ public class EventMain implements Listener {
         if (statuses.containsKey(p)){
             switch (s) {
                 case "bone":
-                    p.spigot().sendMessage(ChatMessageType.ACTION_BAR,
-                            TextComponent.fromLegacyText(ChatColor.RED + "골절 당했습니다!"));
+                    actionBar(p,ChatColor.RED + "골절 당했습니다!");
                     if (statuses.containsKey(p)) {
                         statuses.get(p).getPlayerEffects().put(Status.BreakBones, 5);
                     }
                     break;
                 case "bleed":
-                    p.spigot().sendMessage(ChatMessageType.ACTION_BAR,
-                            TextComponent.fromLegacyText(ChatColor.RED + "출혈 중 입니다!"));
+                    actionBar(p,ChatColor.RED + "출혈 중 입니다!");
                     if (statuses.containsKey(p)) {
                         statuses.get(p).getPlayerEffects().put(Status.Bleed, 5);
                     }
                     break;
                 case "critical":
-                    p.spigot().sendMessage(ChatMessageType.ACTION_BAR,
-                            TextComponent.fromLegacyText(ChatColor.RED + "급소 공격 당했습니다!"));
+                    actionBar(p,ChatColor.RED + "급소 공격 당했습니다!");
                     if (statuses.containsKey(p)) {
                         statuses.get(p).getPlayerEffects().put(Status.Critical, 1);
                     }
                     break;
                 case "dig":
-                    p.spigot().sendMessage(ChatMessageType.ACTION_BAR,
-                            TextComponent.fromLegacyText(ChatColor.RED + "블럭을 캐다 지쳤습니다!"));
+                    actionBar(p,ChatColor.RED + "블럭을 캐다 지쳤습니다!");
                     if (statuses.containsKey(p)) {
                         statuses.get(p).getPlayerEffects().put(Status.StressDig, 5);
                     }
                     break;
                 case "attack":
-                    p.spigot().sendMessage(ChatMessageType.ACTION_BAR,
-                            TextComponent.fromLegacyText(ChatColor.RED + "공격하다 지쳤습니다!"));
+                    actionBar(p,ChatColor.RED + "공격하다 지쳤습니다!");
                     if (statuses.containsKey(p)) {
                         statuses.get(p).getPlayerEffects().put(Status.StressAtk, 5);
                     }
@@ -164,5 +167,8 @@ public class EventMain implements Listener {
             statuses.put(p, ps);
             action(p, s);
         }
+    }
+    public void actionBar(Player p , String message){
+        p.spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacyText(message));
     }
 }

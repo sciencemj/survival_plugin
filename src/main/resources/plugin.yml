@@ -4,3 +4,8 @@ main: sciencemj.survival_plugin.Survival_plugin
 api-version: 1.16
 authors: [ sciencemj ]
 description: plugin for survival
+
+commands:
+  story_start:
+    description: play intro of story
+    usage: /story_start
