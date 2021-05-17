@@ -13,7 +13,6 @@ public final class Survival_plugin extends JavaPlugin {
         // Plugin startup logic
         config = getConfig();
         plugin = this;
-        this.saveDefaultConfig();
         Bukkit.getServer().getPluginManager().registerEvents(new EventMain(), this);
         Bukkit.getServer().getPluginCommand("story_start").setExecutor(new CommandMain());
         //------------------------------------------setting-----------------------------------------------
@@ -46,6 +45,7 @@ public final class Survival_plugin extends JavaPlugin {
     @Override
     public void onDisable() {
         // Plugin shutdown logic
-        this.saveDefaultConfig();
+        config.set("gameClear", EventMain.gameClear);
+        saveConfig();
     }
 }

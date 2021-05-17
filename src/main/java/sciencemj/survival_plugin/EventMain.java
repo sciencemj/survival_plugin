@@ -15,6 +15,7 @@ import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.player.PlayerAdvancementDoneEvent;
+import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.inventory.meta.FireworkMeta;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
@@ -27,7 +28,7 @@ public class EventMain implements Listener {
     HashMap<Player, PlayerStatus> statuses = new HashMap<Player, PlayerStatus>();
     public static HashMap<Player, Integer> digCount = new HashMap<Player, Integer>();
     public static HashMap<Player, Integer> atkCount = new HashMap<Player, Integer>();
-    boolean gameClear = Survival_plugin.config.getBoolean("gameClear");
+    public static boolean gameClear = Survival_plugin.config.getBoolean("gameClear");
     @EventHandler
     public void onPlayerDamageEvent(EntityDamageEvent e){
         if (e.getEntity() instanceof Player && !gameClear){
@@ -100,14 +101,14 @@ public class EventMain implements Listener {
         for (Player p: Bukkit.getOnlinePlayers()) {
             if (e.getAdvancement().getKey().getKey().equals("end/kill_dragon")) {
                 //p.sendMessage(e.getEventName() + " // " + e.getAdvancement().getKey().getKey());
-                p.playSound(p.getLocation(), Sound.MUSIC_END, 10, 1);
+                p.playSound(p.getLocation(), Sound.MUSIC_DISC_PIGSTEP, 10, 1);
                 p.sendTitle(ChatColor.GREEN + "엔더 드래곤을 격파했습니다!", "", 20, 40, 20);
                 Bukkit.getScheduler().scheduleSyncDelayedTask(Survival_plugin.plugin, new Runnable() {
                     @Override
                     public void run() {
                         p.sendTitle(ChatColor.GREEN + "세계에 평화가 찾아옵니다", "난이도 쉬움,HARDMODE:OFF", 20, 40, 20);
                         p.getWorld().setDifficulty(Difficulty.EASY);
-                        gameClear = false;
+                        gameClear = true;
                         Survival_plugin.config.set("gameClear", true);
                         for (int i = 1; i < 6; i++) {
                             Firework firework = p.getWorld().spawn(p.getLocation(), Firework.class);
@@ -124,6 +125,14 @@ public class EventMain implements Listener {
                 }, 80);
             }
         }
+    }
+
+    @EventHandler
+    public void onPlayerJoin(PlayerJoinEvent e){
+        Player p = e.getPlayer();
+        p.sendMessage(ChatColor.GREEN + "플레이어: " + p.getDisplayName());
+        p.sendMessage(ChatColor.RED + "HARDMODE VERSION: " + Survival_plugin.plugin.getDescription().getVersion());
+        p.sendMessage(ChatColor.YELLOW + "GAME CLEAR: " + gameClear);
     }
     public void action(Player p, String s){
         if (statuses.containsKey(p)){
