@@ -91,27 +91,30 @@ public class EventMain implements Listener {
     @EventHandler
     public void killEnderDragon(PlayerAdvancementDoneEvent e){
         for (Player p: Bukkit.getOnlinePlayers()) {
-            p.sendMessage(e.getEventName() +" // " + e.getAdvancement().getKey().getKey());
-            p.playSound(p.getLocation(), Sound.MUSIC_END, 10, 1);
-            p.sendTitle(ChatColor.GREEN+"엔더 드래곤을 격파했습니다!", "", 20,40,20);
-            Bukkit.getScheduler().scheduleSyncDelayedTask(Survival_plugin.plugin, new Runnable() {
-                @Override
-                public void run() {
-                    p.sendTitle(ChatColor.GREEN+"세계에 평화가 찾아옵니다", "난이도 쉬움,HARDMODE:OFF", 20,40,20);
-                    p.getWorld().setDifficulty(Difficulty.EASY);
-                    hardmode=false;
-                    for (int i = 1;i < 6;i++){
-                        Firework firework = p.getWorld().spawn(p.getLocation(), Firework.class);
-                        FireworkMeta meta = firework.getFireworkMeta();
-                        meta.setPower(i);
-                        meta.addEffect(FireworkEffect.builder()
-                                .trail(true)
-                                .withColor(Color.YELLOW, Color.GREEN)
-                                .flicker(true)
-                                .with(FireworkEffect.Type.STAR).build());
+            if (e.getAdvancement().getKey().getKey().equals("end/kill_dragon")) {
+                //p.sendMessage(e.getEventName() + " // " + e.getAdvancement().getKey().getKey());
+                p.playSound(p.getLocation(), Sound.MUSIC_END, 10, 1);
+                p.sendTitle(ChatColor.GREEN + "엔더 드래곤을 격파했습니다!", "", 20, 40, 20);
+                Bukkit.getScheduler().scheduleSyncDelayedTask(Survival_plugin.plugin, new Runnable() {
+                    @Override
+                    public void run() {
+                        p.sendTitle(ChatColor.GREEN + "세계에 평화가 찾아옵니다", "난이도 쉬움,HARDMODE:OFF", 20, 40, 20);
+                        p.getWorld().setDifficulty(Difficulty.EASY);
+                        hardmode = false;
+                        for (int i = 1; i < 6; i++) {
+                            Firework firework = p.getWorld().spawn(p.getLocation(), Firework.class);
+                            FireworkMeta meta = firework.getFireworkMeta();
+                            meta.setPower(i);
+                            meta.addEffect(FireworkEffect.builder()
+                                    .trail(true)
+                                    .withColor(Color.YELLOW, Color.GREEN)
+                                    .flicker(true)
+                                    .with(FireworkEffect.Type.STAR).build());
+                            firework.setFireworkMeta(meta);
+                        }
                     }
-                }
-            },80);
+                }, 80);
+            }
         }
     }
     public void action(Player p, String s){
