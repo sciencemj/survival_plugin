@@ -1,5 +1,5 @@
 name: Survival_plugin
-version: @version@
+version: 1.0
 main: sciencemj.survival_plugin.Survival_plugin
 api-version: 1.16
 authors: [ sciencemj ]

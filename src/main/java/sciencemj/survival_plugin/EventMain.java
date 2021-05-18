@@ -158,7 +158,7 @@ public class EventMain implements Listener {
                 case "dig":
                     actionBar(p,ChatColor.RED + "블럭을 캐다 지쳤습니다!");
                     if (statuses.containsKey(p)) {
-                        statuses.get(p).getPlayerEffects().put(Status.StressDig, 5);
+                        statuses.get(p).getPlayerEffects().put(Status.StressDig, 7);
                     }
                     break;
                 case "attack":
