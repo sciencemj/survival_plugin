@@ -5,30 +5,65 @@ import net.md_5.bungee.api.ChatMessageType;
 import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.*;
 import org.bukkit.advancement.Advancement;
-import org.bukkit.entity.Entity;
-import org.bukkit.entity.EntityType;
-import org.bukkit.entity.Firework;
-import org.bukkit.entity.Player;
+import org.bukkit.block.Block;
+import org.bukkit.block.EnchantingTable;
+import org.bukkit.enchantments.Enchantment;
+import org.bukkit.enchantments.EnchantmentTarget;
+import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
+import org.bukkit.event.enchantment.EnchantItemEvent;
+import org.bukkit.event.enchantment.PrepareItemEnchantEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.player.PlayerAdvancementDoneEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.FireworkMeta;
+import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Random;
+import java.util.*;
 
 public class EventMain implements Listener {
     HashMap<Player, PlayerStatus> statuses = new HashMap<Player, PlayerStatus>();
     public static HashMap<Player, Integer> digCount = new HashMap<Player, Integer>();
     public static HashMap<Player, Integer> atkCount = new HashMap<Player, Integer>();
+    String[] number = new String[] {"I", "II", "III"};
     public static boolean gameClear = Survival_plugin.config.getBoolean("gameClear");
+
+    @EventHandler
+    public void onEnchant(EnchantItemEvent e){
+        if(e.getEnchantBlock().getType().equals(Material.ENCHANTING_TABLE)){
+            int cost = e.getExpLevelCost();
+            ItemStack item = e.getItem();
+            ItemMeta meta = item.getItemMeta();
+            Random r = new Random();
+            if(r.nextInt(50) < cost && cost >= 10 && EnchantmentTarget.WEAPON.includes(item.getType())){
+                assert meta != null;
+                meta.addEnchant(CustomEnchants.attackEnchant, (int)cost/10 - 1, false);
+                List<String> lore = meta.getLore();
+                if(lore == null){
+                    lore = new ArrayList<String>();
+                }
+                lore.add(ChatColor.RESET + "" + ChatColor.GRAY + "공격 피로 감소 " + number[(int)cost/10 - 1]);
+                meta.setLore(lore);
+                item.setItemMeta(meta);
+            }else if(r.nextInt(50) < cost && cost >= 10 && EnchantmentTarget.TOOL.includes(item.getType())){
+                assert meta != null;
+                meta.addEnchant(CustomEnchants.digEnchant, (int)cost/10 - 1, false);
+                List<String> lore = meta.getLore();
+                if(lore == null){
+                    lore = new ArrayList<String>();
+                }
+                lore.add(ChatColor.RESET + "" + ChatColor.GRAY + "채굴 피로 감소 " + number[(int)cost/10 - 1]);
+                meta.setLore(lore);
+                item.setItemMeta(meta);
+            }
+        }
+    }
     @EventHandler
     public void onPlayerDamageEvent(EntityDamageEvent e){
         if (e.getEntity() instanceof Player && !gameClear){
@@ -65,6 +100,16 @@ public class EventMain implements Listener {
     public void playerDigEvent(BlockBreakEvent e){
         Player p = e.getPlayer();
         if (!gameClear) {
+            ItemStack item = p.getInventory().getItemInMainHand();
+            Random r = new Random();
+            Map<Enchantment, Integer> enchants = item.getEnchantments();
+            if (item != null && enchants != null) {
+                if (enchants.containsKey(CustomEnchants.digEnchant)){
+                    if (r.nextInt(40) <= (10 * enchants.get(CustomEnchants.digEnchant))) {
+                        return;
+                    }
+                }
+            }
             if (digCount.containsKey(p)) {
                 digCount.put(p, digCount.get(p) + 1);
                 if (digCount.get(p) >= 10) {
@@ -81,6 +126,17 @@ public class EventMain implements Listener {
     public void playerAtkEvent(EntityDamageByEntityEvent e){
         if (e.getDamager() instanceof Player && !gameClear){
             Player p = (Player) e.getDamager();
+            ItemStack item = p.getInventory().getItemInMainHand();
+            Random r = new Random();
+            Map<Enchantment, Integer> enchants = item.getEnchantments();
+            if (item != null && enchants != null) {
+                if (enchants.containsKey(CustomEnchants.attackEnchant)){
+                    if (r.nextInt(40) <= (10 * enchants.get(CustomEnchants.attackEnchant))) {
+                        actionBar(p,ChatColor.YELLOW + "공격할 힘이 납니다!");
+                        return;
+                    }
+                }
+            }
             if (atkCount.containsKey(p)){
                 atkCount.put(p, atkCount.get(p) + 1);
                 if (atkCount.get(p) >= 3){
@@ -132,6 +188,7 @@ public class EventMain implements Listener {
         Player p = e.getPlayer();
         p.sendMessage(ChatColor.GREEN + "플레이어: " + p.getDisplayName());
         p.sendMessage(ChatColor.RED + "HARDMODE VERSION: " + Survival_plugin.plugin.getDescription().getVersion());
+        p.sendMessage(ChatColor.GREEN + "[V.1.1 patched] 채굴/공격 피로 감소 인챈트 추가");
         p.sendMessage(ChatColor.YELLOW + "GAME CLEAR: " + gameClear);
     }
     public void action(Player p, String s){

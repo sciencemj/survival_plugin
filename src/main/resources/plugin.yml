@@ -1,11 +1,14 @@
-name: Survival_plugin
-version: 1.0
+name: HardCore
+version: 1.1
 main: sciencemj.survival_plugin.Survival_plugin
 api-version: 1.16
 authors: [ sciencemj ]
-description: plugin for survival
+description: plugin for HardCore
 
 commands:
   story_start:
     description: play intro of story
     usage: /story_start
+  enc:
+    description: enchant_test
+    usage: /enc

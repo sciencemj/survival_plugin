@@ -5,7 +5,10 @@ import org.bukkit.Sound;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 
 public class CommandMain implements CommandExecutor {
     @Override
@@ -21,6 +24,19 @@ public class CommandMain implements CommandExecutor {
                         p.sendTitle("엔더 드래곤을 물리치고", "평화를 칮으세요!", 20,40,10);
                     }
                 },70L);
+            }
+        }else if(cmd.getName().equals("enc")){
+            if(sender instanceof Player){
+                Player p = ((Player) sender).getPlayer();
+                ItemStack item = p.getInventory().getItemInMainHand();
+                ItemMeta meta = item.getItemMeta();
+                assert meta != null;
+                if (!meta.hasEnchant(CustomEnchants.attackEnchant)) {
+                    meta.addEnchant(CustomEnchants.attackEnchant, 1, true);
+                }else {
+                    p.sendMessage("already enchanted");
+                }
+                item.setItemMeta(meta);
             }
         }
         return true;
